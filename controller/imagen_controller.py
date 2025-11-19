@@ -9,6 +9,6 @@ servicio = ImagenService()
 def listar():
     return servicio.listar_todo()
 
-@router.get("/codigo/{item_id}")
+@router.get("/{item_id}")
 def buscar_por_id(item_id: int):
     return servicio.buscar_por_id(item_id)
