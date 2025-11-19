@@ -4,15 +4,11 @@ from controller.inventario_controller import router as inventario_router
 from controller.imagen_controller import router as imagen_router
 
 app = FastAPI()
-
-# Registrar rutas
-app.include_router(inventario_router)
-app.include_router(imagen_router)
-
 origins = [
-    "http://localhost",
+    "http://localhost:5173",
     "http://localhost:3000",
-    "http://127.0.0.1:3000",
+    "http://localhost:8080",
+    "http://192.168.80.10:8080",
     "*"
 ]
 
@@ -23,9 +19,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# Registrar rutas
+app.include_router(inventario_router)
+app.include_router(imagen_router)
 
 @app.get("/")
 def root():
-    return {"message": "microservicio funcionando correctamente 🎉"}
+    return {"message": "microservicio funcionando correctamente 🎉"}
 
 
