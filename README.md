@@ -24,8 +24,8 @@ Este microservicio permite consultar el inventario de productos Vitalix Plus med
 
 1. Clonar el repositorio:
 ```bash
-git clone <url-del-repositorio>
-cd <nombre-del-directorio>
+git clone https://github.com/yeisonmenau/vitalixplus-inventario-service.git
+cd vitalixplus-inventario-service
 ```
 
 2. Crear y activar un entorno virtual:
