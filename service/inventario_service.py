@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import unicodedata
 
 class InventarioService:
 
@@ -24,19 +25,22 @@ class InventarioService:
 
     def buscar_por_id(self, valor_id: int):
         if self.df is not None:
-            if 'código' not in self.df.columns:
-                raise KeyError("La columna 'código' no existe en el archivo Excel.")
-
-            resultado = self.df[self.df['código'] == valor_id]
+            col = self._buscar_columna(['codigo', 'código', 'code', 'id', 'item_id', 'codigo_producto'])
+            if not col:
+                raise KeyError("No se encontró una columna de 'código' en el archivo Excel.")
+            
+            # Comparar tolerante: convertir a string y comparar
+            resultado = self.df[self.df[col].astype(str).str.strip() == str(valor_id).strip()]
             return resultado.to_dict(orient="records")
         return []
 
     def buscar_por_nombre(self, nombre: str):
         if self.df is not None:
-            if 'descripción' not in self.df.columns:
-                raise KeyError("La columna 'descripción' no existe en el archivo Excel.")
+            col = self._buscar_columna(['descripcion', 'descripción', 'nombre', 'name', 'producto', 'nombre_producto'])
+            if not col:
+                raise KeyError("No se encontró una columna de 'descripción' en el archivo Excel.")
 
-            resultado = self.df[self.df['descripción'].str.contains(nombre, case=False, na=False)]
+            resultado = self.df[self.df[col].astype(str).str.contains(nombre, case=False, na=False)]
             return resultado.to_dict(orient="records")
         return []
     
@@ -44,6 +48,40 @@ class InventarioService:
         if self.df is not None:
             return self.df.columns.tolist()
         return []
+
+    def _buscar_columna(self, candidatos):
+        """Helper privado: busca columna en candidatos (variantes de nombres con/sin acentos, espacios, etc.).
+        
+        Parámetros:
+        - candidatos: lista de nombres posibles (en cualquier formato).
+        
+        Retorna:
+        - Nombre exacto de la columna en self.df si existe, o None si no.
+        """
+        if self.df is None:
+            return None
+        
+        cols_disponibles = self.df.columns.tolist()
+        
+        def normalizar(s):
+            """Normaliza string: quita acentos, espacios a guiones bajos, minusculas."""
+            s = str(s).strip().lower()
+            # Quitar acentos (ñ -> n, á -> a, etc.)
+            s = ''.join(c for c in unicodedata.normalize('NFD', s) 
+                       if unicodedata.category(c) != 'Mn')
+            # Reemplazar espacios y guiones con guion bajo
+            s = s.replace(' ', '_').replace('-', '_')
+            return s
+        
+        # Normalizar candidatos
+        candidatos_norm = {normalizar(c): c for c in candidatos}
+        
+        # Buscar en columnas del df
+        for col in cols_disponibles:
+            if normalizar(col) in candidatos_norm:
+                return col
+        
+        return None
 
     def exportar_por_categoria(self, nombre_categoria, columna_categoria=None, output_dir=None, filename=None, include_index=False):
         """Exporta los registros filtrados por categoría a un archivo CSV.
@@ -57,45 +95,21 @@ class InventarioService:
 
         Retorna:
         - ruta absoluta del archivo CSV creado (str).
-        - Si no hay DataFrame cargado, lanza ValueError.
         """
         if self.df is None:
             raise ValueError("No hay datos cargados para exportar.")
 
         # Determinar columna de categoría
-        cols = self.df.columns.tolist()
-
-        # Si el usuario especificó columna, usarla (si existe)
         if columna_categoria:
-            if columna_categoria in cols:
-                col = columna_categoria
-            else:
-                # intentar normalizar entrada del usuario (minusculas, espacios->_)
-                alt = columna_categoria.strip().lower().replace(" ", "_")
-                if alt in cols:
-                    col = alt
-                else:
-                    raise KeyError(f"La columna especificada '{columna_categoria}' no existe en el DataFrame.")
+            # Si el usuario especificó columna, intentar normalizarla
+            col = self._buscar_columna([columna_categoria])
+            if not col:
+                raise KeyError(f"La columna especificada '{columna_categoria}' no existe en el DataFrame.")
         else:
-            # Lista de candidatos comunes (ya se normalizaron columnas al cargar)
-            candidatos = [
-                'categoría', 'categoria', 'category', 'tipo', 'clase', 'categoria_producto',
-                'categoria_producto'
-            ]
-            # Normaliza candidatos a la forma que usamos en df (minusculas y guiones bajos)
-            candidatos = list(dict.fromkeys([c.strip().lower().replace(' ', '_') for c in candidatos]))
-            col = None
-            for c in candidatos:
-                if c in cols:
-                    col = c
-                    break
-
-            if col is None:
-                # Si no se encuentra ningún candidato, intentar usar columna llamada 'categoria' sin acento
-                if 'categoria' in cols:
-                    col = 'categoria'
-                else:
-                    raise KeyError("No se encontró una columna de categoría conocida en el DataFrame. Por favor, especifica 'columna_categoria'.")
+            # Intentar detectar columna de categoría automáticamente
+            col = self._buscar_columna(['categoria', 'categoría', 'category', 'tipo', 'clase', 'categoria_producto'])
+            if not col:
+                raise KeyError("No se encontró una columna de categoría conocida. Por favor, especifica 'columna_categoria'.")
 
         # Filtrado (soporta comparaciones case-insensitive para texto)
         serie = self.df[col]
