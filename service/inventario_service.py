@@ -1,8 +1,9 @@
 import pandas as pd
 import os
 import unicodedata
+import logging
 
-class InventarioService:
+logger = logging.getLogger(__name__)
 
     def __init__(self):
         base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -10,12 +11,14 @@ class InventarioService:
 
         try:
             df = pd.read_excel(archivo)
-
-            df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
-
+            df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_", regex=False)
             self.df = df
+            logger.info(f"Archivo cargado exitosamente: {archivo}. Columnas: {df.columns.tolist()}")
         except FileNotFoundError:
-            print("Error: No se encontró el archivo en la ruta especificada.")
+            logger.error(f"Error: No se encontró el archivo en la ruta especificada: {archivo}")
+            self.df = None
+        except Exception as e:
+            logger.error(f"Error al cargar archivo Excel: {str(e)}")
             self.df = None
 
     def listar_todo(self):
