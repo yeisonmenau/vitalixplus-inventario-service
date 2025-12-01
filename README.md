@@ -115,6 +115,129 @@ Busca productos cuya descripción contenga el texto especificado (búsqueda inse
 GET /inventario/nombre/vitamina
 ```
 
+### Exportar por categoría (con almacenamiento en disco)
+```
+GET /inventario/exportar/categoria/{valor}
+```
+Exporta los registros de una categoría a un archivo CSV (se guarda en `files/exports/` y se devuelve como descarga).
+
+**Parámetros:**
+- `valor` (ruta): valor de la categoría a filtrar.
+- `columna` (query, opcional): nombre de la columna de categoría. Si no se proporciona, el sistema intenta detectarla automáticamente entre: `categoría`, `categoria`, `category`, `tipo`, `clase`, `categoria_producto`.
+
+**Ejemplos:**
+```
+GET /inventario/exportar/categoria/vitaminas
+GET /inventario/exportar/categoria/bebidas?columna=tipo
+```
+
+**Respuesta:**
+- Archivo CSV descargable (Content-Type: `text/csv`).
+- También se guarda en `files/exports/export_categoria_{columna}_{valor}.csv`.
+
+### Exportar por categoría (en memoria, sin disco)
+```
+GET /inventario/exportar/categoria/{valor}/stream
+```
+Exporta los registros de una categoría directamente como stream (en memoria, sin escribir en disco).
+
+**Parámetros:**
+- `valor` (ruta): valor de la categoría a filtrar.
+- `columna` (query, opcional): nombre de la columna de categoría.
+
+**Ejemplos:**
+```
+GET /inventario/exportar/categoria/vitaminas/stream
+GET /inventario/exportar/categoria/bebidas/stream?columna=tipo
+```
+
+**Respuesta:**
+- Archivo CSV descargable (Content-Type: `text/csv`).
+- NO se guarda en servidor (más eficiente para archivos grandes).
+
+---
+
+## 🧪 Pruebas
+
+Ejecutar tests unitarios:
+```bash
+pip install pytest
+pytest test_inventario.py -v
+```
+
+Tests incluidos:
+- Carga de archivo Excel
+- Listado de columnas
+- Búsqueda por ID
+- Búsqueda por nombre
+- Helper de detección de columnas
+- Exportación en stream
+- Exportación a disco
+
+---
+
+## 🛠️ Características principales
+
+- ✅ **Detección inteligente de columnas**: Detecta automáticamente nombres de columnas con/sin acentos, espacios, variantes (`código` / `codigo`, etc.).
+- ✅ **Búsquedas tolerantes**: Soporta búsqueda case-insensitive por nombre e ID.
+- ✅ **Exportación flexible**: Dos opciones de exportación — en disco (guarda archivo) o por stream (descarga directa en memoria).
+- ✅ **Logging automático**: Registra cargas de archivos, exportaciones y errores.
+- ✅ **Manejo de errores robusto**: HTTPException con status codes apropiados (400 para entrada inválida, 500 para errores del servidor).
+- ✅ **Documentación automática**: Swagger disponible en `/docs` y ReDoc en `/redoc`.
+
+---
+
+## 📝 Ejemplo de uso completo (Python + requests)
+
+```python
+import requests
+
+BASE_URL = "http://localhost:8000"
+
+# 1. Listar todo
+response = requests.get(f"{BASE_URL}/inventario/")
+todos = response.json()
+print(f"Total productos: {len(todos)}")
+
+# 2. Buscar por código
+response = requests.get(f"{BASE_URL}/inventario/codigo/101")
+producto = response.json()
+print(f"Producto: {producto}")
+
+# 3. Buscar por nombre
+response = requests.get(f"{BASE_URL}/inventario/nombre/vitamina")
+resultados = response.json()
+print(f"Encontrados: {len(resultados)} productos con 'vitamina'")
+
+# 4. Exportar por categoría (a disco)
+response = requests.get(f"{BASE_URL}/inventario/exportar/categoria/bebidas")
+with open("bebidas.csv", "wb") as f:
+    f.write(response.content)
+print("CSV descargado: bebidas.csv")
+
+# 5. Exportar por categoría (stream, sin disco)
+response = requests.get(f"{BASE_URL}/inventario/exportar/categoria/vitaminas/stream")
+with open("vitaminas.csv", "wb") as f:
+    f.write(response.content)
+print("CSV descargado (stream): vitaminas.csv")
+```
+
+---
+
+## 🔄 Flujo de trabajo (Git)
+
+Rama actual: `feature/ExportCSV`
+
+Cambios implementados:
+1. Método `exportar_por_categoria` — exportación a disco con detección automática de categoría.
+2. Endpoint `GET /inventario/exportar/categoria/{valor}` — descarga CSV desde disco.
+3. Helper `_buscar_columna` — detección robusta de nombres de columnas.
+4. Actualización de `buscar_por_id` / `buscar_por_nombre` — búsquedas tolerantes.
+5. Método `exportar_por_categoria_stream` — exportación en memoria.
+6. Endpoint `GET /inventario/exportar/categoria/{valor}/stream` — descarga CSV desde stream.
+7. Tests unitarios (`test_inventario.py`) — validación de funcionalidad.
+8. Logging mejorado — registro de operaciones y errores.
+
 ## 📁 Estructura del Proyecto
 
 ```
