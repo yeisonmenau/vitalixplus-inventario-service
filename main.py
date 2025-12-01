@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from controller.inventario_controller import router as inventario_router
 from controller.imagen_controller import router as imagen_router
+from controller.ia_controller import router as ia_router
 
 app = FastAPI()
 origins = [
@@ -22,6 +23,7 @@ app.add_middleware(
 # Registrar rutas
 app.include_router(inventario_router)
 app.include_router(imagen_router)
+app.include_router(ia_router)
 
 @app.get("/")
 def root():

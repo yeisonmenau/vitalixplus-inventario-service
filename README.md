@@ -11,6 +11,8 @@ Este microservicio permite consultar el inventario de productos Vitalix Plus med
 - Consulta completa del inventario
 - Búsqueda de productos por código
 - Búsqueda de productos por nombre (coincidencia parcial)
+- Búsqueda de productos por categoría
+- **IA Asistente: Consultas en lenguaje natural**
 - Carga automática de datos desde Excel
 - API documentada automáticamente con Swagger
 
@@ -128,6 +130,46 @@ Busca productos que pertenezcan a una categoría específica.
 ```
 GET /inventario/categoria/suplementos
 ```
+
+### IA Asistente - Consultas en lenguaje natural
+```
+POST /ia/consultar
+```
+Realiza consultas inteligentes sobre el inventario usando lenguaje natural.
+
+**Body:**
+```json
+{
+  "pregunta": "¿Cuántos productos de vitaminas hay?"
+}
+```
+
+**Ejemplos de preguntas:**
+- "¿Cuántos productos hay en el inventario?"
+- "Dame productos de suplementos"
+- "¿Cuál es el producto más caro?"
+- "¿Qué categorías tengo disponibles?"
+- "Muestra productos entre 10000 y 50000"
+- "Dame estadísticas del inventario"
+
+**Respuesta:**
+```json
+{
+  "respuesta": "Hay 15 productos en la categoría 'vitaminas'",
+  "intencion_detectada": "contar",
+  "datos": {
+    "cantidad": 15,
+    "categoria": "vitaminas",
+    "productos": [...]
+  }
+}
+```
+
+### Ver ejemplos de consultas IA
+```
+GET /ia/ejemplos
+```
+Retorna una lista de preguntas de ejemplo y las intenciones soportadas por la IA.
 
 ## 📁 Estructura del Proyecto
 
