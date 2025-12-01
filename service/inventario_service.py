@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import unicodedata
 import logging
+from io import StringIO
 
 logger = logging.getLogger(__name__)
 
@@ -145,3 +146,44 @@ logger = logging.getLogger(__name__)
         resultado.to_csv(output_path, index=include_index, encoding='utf-8-sig')
 
         return os.path.abspath(output_path)
+
+    def exportar_por_categoria_stream(self, nombre_categoria, columna_categoria=None, include_index=False):
+        """Exporta los registros filtrados por categoría en formato CSV (en memoria, sin disco).
+
+        Parámetros:
+        - nombre_categoria: valor de la categoría a filtrar (str o numérico).
+        - columna_categoria: nombre de la columna a usar como categoría (opcional).
+        - include_index: si True incluye el índice en el CSV.
+
+        Retorna:
+        - StringIO con contenido CSV (bytes/string listo para StreamingResponse).
+        """
+        if self.df is None:
+            raise ValueError("No hay datos cargados para exportar.")
+
+        # Determinar columna de categoría (mismo lógica que exportar_por_categoria)
+        if columna_categoria:
+            col = self._buscar_columna([columna_categoria])
+            if not col:
+                raise KeyError(f"La columna especificada '{columna_categoria}' no existe en el DataFrame.")
+        else:
+            col = self._buscar_columna(['categoria', 'categoría', 'category', 'tipo', 'clase', 'categoria_producto'])
+            if not col:
+                raise KeyError("No se encontró una columna de categoría conocida. Por favor, especifica 'columna_categoria'.")
+
+        # Filtrado
+        serie = self.df[col]
+        if pd.api.types.is_string_dtype(serie):
+            mask = serie.astype(str).str.strip().str.lower() == str(nombre_categoria).strip().lower()
+        else:
+            mask = serie == nombre_categoria
+
+        resultado = self.df[mask]
+
+        # Generar CSV en memoria
+        buffer = StringIO()
+        resultado.to_csv(buffer, index=include_index, encoding='utf-8')
+        buffer.seek(0)
+
+        logger.info(f"Exportación en stream para categoría '{nombre_categoria}' generada (columna: {col}, registros: {len(resultado)})")
+        return buffer
