@@ -17,6 +17,7 @@ env/
 venv/
 ENV/
 env.bak/
+venv.bak/
 
 ####################################
 # IDE / Editor / OS Files
@@ -37,3 +38,18 @@ thumbs.db
 *.tgz
 *.cache
 *.tmp
+
+####################################
+# Project Specific
+####################################
+# Exportaciones CSV (no guardar en git, se generan localmente)
+files/exports/*.csv
+
+# Archivos de testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment files (sensibles)
+.env.local
+.env.*.local
