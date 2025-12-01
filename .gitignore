@@ -1,0 +1,39 @@
+####################################
+# Python
+####################################
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Cython debug symbols
+cython_debug/
+
+####################################
+# Virtual Environments
+####################################
+.env
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+
+####################################
+# IDE / Editor / OS Files
+####################################
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+thumbs.db
+
+####################################
+# Logs & Local Artifacts
+####################################
+*.log
+*.pid
+*.gz
+*.tgz
+*.cache
+*.tmp
