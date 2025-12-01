@@ -6,6 +6,8 @@ from io import StringIO
 
 logger = logging.getLogger(__name__)
 
+class InventarioService:
+
     def __init__(self):
         base_dir = os.path.dirname(os.path.abspath(__file__))
         archivo = os.path.join(base_dir, '..', 'files', 'data', 'inventario_vitalix_plus.xlsx')
