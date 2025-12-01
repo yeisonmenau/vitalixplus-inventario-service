@@ -115,6 +115,20 @@ Busca productos cuya descripción contenga el texto especificado (búsqueda inse
 GET /inventario/nombre/vitamina
 ```
 
+### Buscar por categoría
+```
+GET /inventario/categoria/{categoria}
+```
+Busca productos que pertenezcan a una categoría específica.
+
+**Parámetros:**
+- `categoria` (string): Nombre de la categoría (insensible a mayúsculas/minúsculas)
+
+**Ejemplo:**
+```
+GET /inventario/categoria/suplementos
+```
+
 ## 📁 Estructura del Proyecto
 
 ```

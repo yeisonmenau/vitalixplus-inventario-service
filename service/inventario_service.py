@@ -2,6 +2,13 @@ import pandas as pd
 import os
 
 class InventarioService:
+    def buscar_por_categoria(self, categoria: str):
+        if self.df is not None:
+            if 'categoría' not in self.df.columns:
+                raise KeyError("La columna 'categoría' no existe en el archivo Excel.")
+            resultado = self.df[self.df['categoría'].str.lower() == categoria.lower()]
+            return resultado.to_dict(orient="records")
+        return []
 
     def __init__(self):
         base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -9,9 +16,10 @@ class InventarioService:
 
         try:
             df = pd.read_excel(archivo)
-
             df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
-
+            # Si no existe la columna 'categoría', la agrega vacía
+            if 'categoría' not in df.columns:
+                df['categoría'] = ''
             self.df = df
         except FileNotFoundError:
             print("Error: No se encontró el archivo en la ruta especificada.")
