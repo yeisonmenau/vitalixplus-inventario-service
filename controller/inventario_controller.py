@@ -13,8 +13,8 @@ def listar():
         return servicio.listar_todo()
     except RuntimeError as e:
         raise HTTPException(status_code=503, detail=str(e))
-    except Exception:
-        raise HTTPException(status_code=500, detail="Error interno del servidor")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
 
 @router.get("/codigo/{item_id}")
 def buscar_por_id(item_id: int):
@@ -32,9 +32,9 @@ def buscar_por_id(item_id: int):
         raise HTTPException(status_code=503, detail=str(e))
     except HTTPException:
         raise
-    except Exception:
-        raise HTTPException(status_code=500, detail="Error interno del servidor")
-    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
+
 @router.get("/nombre/{nombre}")
 def buscar_por_nombre(nombre: str):
     """Busca productos por nombre (coincidencia parcial)"""
