@@ -26,12 +26,13 @@ def buscar_por_id(item_id: int) -> Dict[str, Any]:
         return resultado
     except HTTPException:
         raise
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except RuntimeError as e:
-        raise HTTPException(status_code=503, detail=str(e))
-    except KeyError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except (ValueError, RuntimeError, KeyError) as e:
+        status_code = {
+            ValueError: 400,
+            RuntimeError: 503,
+            KeyError: 500
+        }[type(e)]
+        raise HTTPException(status_code=status_code, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
 
@@ -45,12 +46,13 @@ def buscar_por_nombre(nombre: str) -> List[Dict[str, Any]]:
         return resultado
     except HTTPException:
         raise
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except RuntimeError as e:
-        raise HTTPException(status_code=503, detail=str(e))
-    except KeyError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except (ValueError, RuntimeError, KeyError) as e:
+        status_code = {
+            ValueError: 400,
+            RuntimeError: 503,
+            KeyError: 500
+        }[type(e)]
+        raise HTTPException(status_code=status_code, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
 
@@ -65,11 +67,12 @@ def buscar_por_categoria(categoria: str) -> List[Dict[str, Any]]:
         return resultado
     except HTTPException:
         raise
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except RuntimeError as e:
-        raise HTTPException(status_code=503, detail=str(e))
-    except KeyError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except (ValueError, RuntimeError, KeyError) as e:
+        status_code = {
+            ValueError: 400,
+            RuntimeError: 503,
+            KeyError: 500
+        }[type(e)]
+        raise HTTPException(status_code=status_code, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
