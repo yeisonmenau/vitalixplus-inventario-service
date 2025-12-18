@@ -24,14 +24,14 @@ def buscar_por_id(item_id: int) -> Dict[str, Any]:
         if not resultado:
             raise HTTPException(status_code=404, detail=f"No se encontró ningún producto con el código {item_id}")
         return resultado
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except KeyError as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    except RuntimeError as e:
-        raise HTTPException(status_code=503, detail=str(e))
     except HTTPException:
         raise
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except KeyError as e:
+        raise HTTPException(status_code=500, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
 
@@ -43,14 +43,14 @@ def buscar_por_nombre(nombre: str) -> List[Dict[str, Any]]:
         if not resultado:
             raise HTTPException(status_code=404, detail=f"No se encontraron productos que coincidan con '{nombre}'")
         return resultado
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except KeyError as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    except RuntimeError as e:
-        raise HTTPException(status_code=503, detail=str(e))
     except HTTPException:
         raise
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except KeyError as e:
+        raise HTTPException(status_code=500, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
 
@@ -63,13 +63,13 @@ def buscar_por_categoria(categoria: str) -> List[Dict[str, Any]]:
         if not resultado:
             raise HTTPException(status_code=404, detail=f"No se encontraron productos en la categoría '{categoria}'")
         return resultado
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except KeyError as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    except RuntimeError as e:
-        raise HTTPException(status_code=503, detail=str(e))
     except HTTPException:
         raise
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except KeyError as e:
+        raise HTTPException(status_code=500, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
